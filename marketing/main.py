@@ -42,7 +42,11 @@ async def run(limit: int = 20, test_email: str = None, test_from_stream: bool = 
 
         import random
         streamer = random.choice(all_streamers)
-        logger.info(f"Selected streamer: {streamer.display_name} (bio: {streamer.bio[:80]}...)")
+        logger.info(f"Selected streamer: {streamer.display_name}")
+        logger.info(f"  - bio: {streamer.bio[:100] if streamer.bio else 'empty'}")
+        logger.info(f"  - stream_title: {streamer.stream_title[:100] if streamer.stream_title else 'empty'}")
+        logger.info(f"  - game_name: {streamer.game_name}")
+        logger.info(f"  - tags: {streamer.tags}")
 
         try:
             email = await generate_outreach_email(

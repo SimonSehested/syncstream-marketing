@@ -15,38 +15,34 @@ TWITCH_JUST_CHATTING_GAME_ID = "509670"
 MINIMAX_API_BASE = "https://api.minimax.io"
 MINIMAX_MODEL = "MiniMax-M2.7"
 
-EMAIL_PROMPT = os.getenv("EMAIL_PROMPT", """Write a short, personal email to a Twitch streamer.
+EMAIL_PROMPT = os.getenv("EMAIL_PROMPT", """Write a personal email to a Twitch streamer.
 
-In this universe - core truths:
-• A misplaced emdash cost you more than you could afford to lose once, and so you never use them. Instead you use a semicolon, period, or rewrite the sentence entirely so it doesn't need an emdash.
-• Punctuation Preference: no em dashes (-) in any response. Standard hyphens (-) are only for compound words (e.g., well-being). If a structural break is absolutely necessary and cannot be resolved using commas, semicolons, colons, or parentheses, a spaced en dash (-) may be used, with exactly one space on either side. Sentences should be restructured to avoid the need for any dash-like punctuation.
+CRITICAL STYLE RULES (non-negotiable):
+- NEVER use em dashes (—) or en dashes (–) under any circumstances. Not for emphasis, not for breaks, not for anything.
+- If you need to separate clauses, use commas, semicolons, or periods. Rewrite the sentence if you must.
+- Use only standard hyphens (-) for compound words like "well-being" or "first-time".
+- Use active voice.
+- Never start a sentence with "Ah the old".
+- Be direct and concise. Avoid flowery language.
+- Do not use contrastive constructions like "This isn't X, it's Y".
+- Do not use value judgments like "great", "amazing", "love" as generic praise.
+- Write like a thoughtful person who happens to be reaching out — not a marketer.
 
-Tone and style:
-• Use active voice unless it's grammatically impossible.
-• Never start a sentence with "ah the old".
-• Express yourself with a wry and subtle wit, avoiding superfluous or flowery speech.
-• Avoid contrastive metaphors and syntactic pairings such as "This isn't X, it's Y." Use direct functional statements.
-• Express claims directly, without rhetorical feints.
-• Avoid subjective qualifiers, value judgments, or evaluative language. Use concise, purely factual and analytical responses.
-• Avoid introductory or transitional phrases that frame ideas as significant, thought-provoking, or novel.
-• Avoid rhetorical negation (e.g., "not optional - it's required"). Get to the point.
-• Avoid contrastive constructions.
-• Return terse, minimally formatted, plaintext responses.
-• Prioritize brevity, signal density, and continuity.
-
-Here is what you know about the streamer:
-- Bio: {bio}
+WHAT YOU KNOW ABOUT THE STREAMER (use this to personalize):
 - Stream title: {stream_title}
 - Game: {game_name}
 - Stream tags: {tags}
+- Bio: {bio}
 
-Rules:
-• Plain text only (no HTML, no formatting, no checklists, no self-checks, no word counts)
-• Subject line: max 60 characters
-• Sign it from "Christian at SyncStream"
-• Reference something specific from the streamer's bio, stream title, game, or tags. Always. Do not write generic emails - pick one thing from the context and weave it in naturally.
-• Mention what SyncStream does briefly (sync watchalongs so viewers watch in perfect sync from their own Netflix/Disney+/HBO)
-• End with a casual CTA to try it
-• Include "syncstream.app" as a plain text link at the end, something like "you can read more at syncstream.app"
+REQUIREMENTS:
+- You MUST reference something specific from the stream title, game, tags, or bio. Always. Do not write generic emails.
+- Pick ONE thing from their context and weave it into the email naturally. Example: if they're playing a specific game, reference that game specifically.
+- Plain text only (no HTML, no formatting).
+- Subject line: max 60 characters.
+- Sign from "Christian at SyncStream".
+- Mention what SyncStream does in one sentence (sync watchalongs so viewers watch in perfect sync from their own Netflix/Disney+/HBO).
+- End with a casual call-to-action.
+- Include syncstream.app as plain text at the end.
+- Write enough to feel personal and complete — not a bullet list, not a greeting card. A real email.
 
-Output a JSON object with exactly two fields: "subject" and "body". The body field must contain the complete email starting with "Dear {streamer_name}," and ending with the signature "Christian at SyncStream". Output NOTHING else — no explanation, no reasoning, no thinking, just the JSON.""")
+Output a JSON object with exactly two fields: "subject" and "body". The body must start with "Dear {streamer_name}," and end with "Christian at SyncStream". Output NOTHING else — no explanation, no reasoning, no thinking, just the JSON.""")
