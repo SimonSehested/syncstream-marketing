@@ -63,18 +63,17 @@ async def main():
 
     content = data["choices"][0]["message"]["content"]
 
-    # Save full response to file
-    output_file = "marketing/minimax_raw_output.txt"
-    with open(output_file, "w", encoding="utf-8") as f:
-        f.write(content)
+    print(f"\n\n=== MINIMAX RESPONSE ({len(content)} chars) ===\n")
 
-    print(f"Full output saved to {output_file}")
-    print(f"Response length: {len(content)} characters")
-    print("\n" + "=" * 80)
-    print("MINIMAX RAW OUTPUT:")
-    print("=" * 80)
-    print(content)
-    print("=" * 80)
+    # Print in chunks of 1500 chars
+    chunk_size = 1500
+    for i in range(0, len(content), chunk_size):
+        chunk = content[i:i+chunk_size]
+        print(f"--- CHUNK {i//chunk_size + 1} (chars {i}-{i+len(chunk)}) ---")
+        print(chunk)
+        print()
+
+    print(f"\n=== END MINIMAX RESPONSE ===\n")
 
 if __name__ == "__main__":
     asyncio.run(main())
