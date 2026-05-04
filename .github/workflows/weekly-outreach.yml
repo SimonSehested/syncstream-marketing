@@ -55,7 +55,7 @@ jobs:
           if [ "${{ inputs.test_from_stream }}" = "true" ]; then
             python -m marketing.main --test-from-stream --test-email "${{ inputs.test_email }}"
           elif [ "${{ inputs.minimax_test }}" = "true" ]; then
-            python test_minimax.py
+            python marketing/test_minimax.py
           elif [ -n "${{ inputs.test_email }}" ]; then
             python -m marketing.main --test-email "${{ inputs.test_email }}"
           else
