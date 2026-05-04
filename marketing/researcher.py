@@ -51,80 +51,39 @@ async def generate_outreach_email(
         )
         resp.raise_for_status()
         data = resp.json()
-        logger.info(f"API response data keys: {list(data.keys())}")
-        logger.info(f"Choices[0] keys: {list(data.get('choices', [{}])[0].keys()) if data.get('choices') else 'no choices'}")
-        
+
     content = data["choices"][0]["message"]["content"]
-    logger.info(f"MiniMax raw response type: {type(content)}, content: {str(content)[:500]}")
-    if isinstance(content, dict):
-        logger.info(f"Content is dict, keys: {list(content.keys())}")
+    logger.info(f"MiniMax raw response: {content[:800]}")
     return _parse_email_response(content, streamer_name, stream_title, game_name)
 
 
 def _parse_email_response(content: str, streamer_name: str = "there", stream_title: str = "", game_name: str = "") -> GeneratedEmail:
-    if isinstance(content, dict):
-        content = json.dumps(content)
-    
     content = str(content).strip()
-    logger.info(f"Parsing content: {content[:500]}")
 
     subject = "Let's sync: try SyncStream"
     body = ""
 
     try:
         parsed = json.loads(content)
-        logger.info(f"Parsed type: {type(parsed)}, content repr: {repr(parsed)[:200]}")
-        
         if isinstance(parsed, dict):
-            logger.info(f"Dict keys: {list(parsed.keys())}")
-            try:
-                subject = str(parsed["subject"])
-            except KeyError:
-                try:
-                    subject = str(parsed['"subject"'])
-                except KeyError:
-                    subject = "Let's sync: try SyncStream"
-            try:
-                body = str(parsed["body"])
-            except KeyError:
-                try:
-                    body = str(parsed['"body"'])
-                except KeyError:
-                    body = ""
+            subject = str(parsed.get("subject", subject))
+            body = str(parsed.get("body", ""))
         elif isinstance(parsed, str):
-            logger.info(f"Parsed is string, re-parsing: {parsed[:200]}")
             inner = json.loads(parsed)
-            logger.info(f"Inner dict keys: {list(inner.keys())}")
-            subject = str(inner.get("subject", subject))
-            body = str(inner.get("body", ""))
-        else:
-            logger.info(f"Parsed type not handled: {type(parsed)}, trying line-by-line")
-            raise json.JSONDecodeError("Not a dict or str", content, 0)
-            
-    except (json.JSONDecodeError, KeyError, TypeError, AttributeError) as e:
-        logger.info(f"Parse failed: {type(e).__name__}: {e}, trying line-by-line")
-        lines = content.split("\n")
-        body_lines = []
-        in_body = False
-        for line in lines:
-            upper = line.upper().strip()
-            if upper.startswith("SUBJECT:"):
-                subject = line[len("SUBJECT:"):].strip()
-                continue
-            if "DEAR " in upper or upper.startswith("DEAR"):
-                in_body = True
-            if in_body:
-                body_lines.append(line)
-        body = "\n".join(body_lines).strip()
+            if isinstance(inner, dict):
+                subject = str(inner.get("subject", subject))
+                body = str(inner.get("body", ""))
+    except (json.JSONDecodeError, KeyError, TypeError, AttributeError):
+        pass
 
     if not body or len(body) < 50:
         personal_detail = stream_title or game_name or "your stream"
         body = f"Hi {streamer_name},\n\nI saw you streaming {personal_detail} and wanted to reach out. I'm building SyncStream, a tool that lets streamers host watchalongs where everyone watches in perfect sync from their own Netflix or Disney+ account.\n\nIt could be a fun thing to try for your community. You can read more at syncstream.app.\n\nChristian at SyncStream"
         subject = "Saw your stream"
     else:
-        subject = subject.replace("—", "-").replace("–", "-")
+        subject = subject.replace("\u2014", "-").replace("\u2013", "-")
 
-    body = body.replace("—", "-").replace("–", "-")
+    body = body.replace("\u2014", "-").replace("\u2013", "-")
 
     nl_double = '\n\n'
     nl_single = '\n'
