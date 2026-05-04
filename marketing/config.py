@@ -13,7 +13,7 @@ TWITCH_API_BASE = "https://api.twitch.tv/helix"
 TWITCH_JUST_CHATTING_GAME_ID = "509670"
 
 MINIMAX_API_BASE = "https://api.minimax.io"
-MINIMAX_MODEL = "MiniMax-M2.7"
+MINIMAX_MODEL = "MiniMax-Text-01"
 
 EMAIL_PROMPT = os.getenv("EMAIL_PROMPT", """Write a personal email to a Twitch streamer.
 

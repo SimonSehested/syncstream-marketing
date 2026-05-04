@@ -39,7 +39,7 @@ async def generate_outreach_email(
 
     message = client.messages.create(
         model=MINIMAX_MODEL,
-        max_tokens=1200,
+        max_tokens=2048,
         system="You are a helpful assistant. Output ONLY valid JSON.",
         messages=[
             {
