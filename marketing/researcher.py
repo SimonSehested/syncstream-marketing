@@ -41,7 +41,7 @@ async def generate_outreach_email(
                 "messages": [
                     {"role": "user", "content": prompt}
                 ],
-                "max_completion_tokens": 800,
+                "max_completion_tokens": 1200,
                 "temperature": 0.8,
                 "response_format": {"type": "json_object"},
             },
@@ -51,23 +51,28 @@ async def generate_outreach_email(
         data = resp.json()
 
     content = data["choices"][0]["message"]["content"]
-    return _parse_email_response(content, streamer_name)
+    return _parse_email_response(content, streamer_name, stream_title, game_name)
 
 
-def _parse_email_response(content: str, streamer_name: str = "there") -> GeneratedEmail:
+def _parse_email_response(content: str, streamer_name: str = "there", stream_title: str = "", game_name: str = "") -> GeneratedEmail:
     content = content.strip()
 
     try:
         parsed = json.loads(content)
-        subject = parsed.get("subject", "Let's sync — try SyncStream!")
+        subject = parsed.get("subject", "Let's sync: try SyncStream")
         body = parsed.get("body", "")
     except json.JSONDecodeError:
-        subject = "Let's sync — try SyncStream!"
+        subject = "Let's sync: try SyncStream"
         body = ""
 
-    if not body or len(body) < 20:
-        body = f"Hi {streamer_name},\n\nI love your stream and the community you've built. I've been working on a tool called SyncStream that I think you'd really like — it lets you host watchalongs where everyone watches in perfect sync from their own Netflix or Disney+ account.\n\nWould love for you to try it out for your next watchalong!\n\nChristian at SyncStream"
-        subject = "Let's sync — try SyncStream!"
+    if not body or len(body) < 50:
+        personal_detail = stream_title or game_name or "your stream"
+        body = f"Hi {streamer_name},\n\nI saw you streaming {personal_detail} and wanted to reach out. I'm building SyncStream, a tool that lets streamers host watchalongs where everyone watches in perfect sync from their own Netflix or Disney+ account.\n\nIt could be a fun thing to try for your community. You can read more at syncstream.app.\n\nChristian at SyncStream"
+        subject = "Saw your stream"
+    else:
+        subject = subject.replace("—", "-").replace("–", "-")
+
+    body = body.replace("—", "-").replace("–", "-")
 
     nl_double = '\n\n'
     nl_single = '\n'
