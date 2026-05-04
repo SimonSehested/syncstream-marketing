@@ -52,7 +52,13 @@ async def generate_outreach_email(
         resp.raise_for_status()
         data = resp.json()
 
-    content = data["choices"][0]["message"]["content"]
+    logger.info(f"API response keys: {list(data.keys())}")
+    logger.info(f"Choices count: {len(data.get('choices', []))}")
+    
+    message = data["choices"][0]["message"]
+    logger.info(f"Message keys: {list(message.keys())}")
+    
+    content = message["content"]
     logger.info(f"MiniMax raw response: {content[:800]}")
     return _parse_email_response(content, streamer_name, stream_title, game_name)
 
