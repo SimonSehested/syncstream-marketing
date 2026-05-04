@@ -48,6 +48,9 @@ async def run(limit: int = 20, test_email: str = None, test_from_stream: bool = 
             email = await generate_outreach_email(
                 streamer_name=streamer.display_name,
                 bio=streamer.bio,
+                stream_title=streamer.stream_title,
+                game_name=streamer.game_name,
+                tags=streamer.tags,
             )
         except Exception as e:
             logger.error(f"AI generation failed: {e}")
@@ -67,6 +70,9 @@ async def run(limit: int = 20, test_email: str = None, test_from_stream: bool = 
             email = await generate_outreach_email(
                 streamer_name="Test Streamer",
                 bio="Just a test bio for testing purposes.",
+                stream_title="Testing the system with a fake stream title",
+                game_name="Just Chatting",
+                tags=["English", "Community"],
             )
         except Exception as e:
             logger.error(f"AI generation failed: {e}")
@@ -111,6 +117,9 @@ async def run(limit: int = 20, test_email: str = None, test_from_stream: bool = 
             email = await generate_outreach_email(
                 streamer_name=streamer.display_name,
                 bio=streamer.bio,
+                stream_title=streamer.stream_title,
+                game_name=streamer.game_name,
+                tags=streamer.tags,
             )
         except Exception as e:
             logger.error(f"[{streamer.display_name}] AI generation failed: {e}")

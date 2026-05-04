@@ -24,6 +24,9 @@ class Streamer:
     bio: str
     profile_image_url: str
     email: Optional[str]
+    stream_title: str
+    game_name: str
+    tags: list[str]
 
 
 class TwitchScraper:
@@ -93,6 +96,9 @@ class TwitchScraper:
                         bio=bio,
                         profile_image_url=user_info.get("profile_image_url", ""),
                         email=email,
+                        stream_title=stream.get("title", ""),
+                        game_name=stream.get("game_name", ""),
+                        tags=stream.get("tags", []),
                     ))
 
                 cursor = data.get("pagination", {}).get("cursor")

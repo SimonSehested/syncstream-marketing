@@ -15,8 +15,19 @@ class GeneratedEmail:
 async def generate_outreach_email(
     streamer_name: str,
     bio: str,
+    stream_title: str = "",
+    game_name: str = "",
+    tags: list[str] = None,
 ) -> GeneratedEmail:
-    prompt = EMAIL_PROMPT.format(streamer_name=streamer_name)
+    if tags is None:
+        tags = []
+    prompt = EMAIL_PROMPT.format(
+        streamer_name=streamer_name,
+        bio=bio or "No bio available",
+        stream_title=stream_title or "No stream title available",
+        game_name=game_name or "Unknown",
+        tags=", ".join(tags) if tags else "none",
+    )
 
     async with httpx.AsyncClient() as client:
         resp = await client.post(
@@ -30,7 +41,7 @@ async def generate_outreach_email(
                 "messages": [
                     {"role": "user", "content": prompt}
                 ],
-                "max_completion_tokens": 400,
+                "max_completion_tokens": 800,
                 "temperature": 0.8,
                 "response_format": {"type": "json_object"},
             },
