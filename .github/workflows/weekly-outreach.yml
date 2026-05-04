@@ -44,7 +44,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install httpx resend python-dotenv
+        run: pip install httpx resend python-dotenv anthropic
 
       - name: Run outreach
         env:
