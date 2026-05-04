@@ -57,7 +57,7 @@ async def run(limit: int = 20, test_email: str = None, test_from_stream: bool = 
                 tags=streamer.tags,
             )
         except Exception as e:
-            logger.error(f"AI generation failed: {e}")
+            logger.error(f"AI generation failed: {type(e).__name__}: {e}")
             sys.exit(1)
 
         success = send_email(test_email, email.subject, email.body)
@@ -81,7 +81,7 @@ async def run(limit: int = 20, test_email: str = None, test_from_stream: bool = 
                 tags=["English", "Community"],
             )
         except Exception as e:
-            logger.error(f"AI generation failed: {e}")
+            logger.error(f"AI generation failed: {type(e).__name__}: {e}")
             sys.exit(1)
 
         success = send_email(test_email, email.subject, email.body)
