@@ -15,24 +15,24 @@ async def generate_outreach_email(
     bio: str,
     profile_image_url: str,
 ) -> GeneratedEmail:
-    prompt = f"""You are a Danish marketing assistant for SyncStream — a tool that lets streamers host synchronized watchalongs with their viewers, so everyone watches in perfect sync from their own Netflix, Disney+, or HBO account.
+    prompt = f"""Write a SHORT email (max 150 words) to a Twitch streamer named "{streamer_name}".
 
-Write a short, personal email to this Twitch streamer:
-- Display name: {streamer_name}
-- Bio: {bio}
+Write ONLY the subject line and email body. NOTHING else. No explanations. No thinking. No markdown headers.
 
-The email should:
-1. Be friendly and personal (not generic)
-2. Briefly explain what SyncStream does
-3. Have a clear CTA to try SyncStream for free
-4. Be in English (the streamer writes in English based on their bio)
-5. Be maximum 200 words
-6. Include a compelling subject line
+Subject line must be max 100 characters.
+Email body must be plain HTML with inline CSS only. No external stylesheets.
 
-Format your response EXACTLY like this (nothing else):
-SUBJECT: <subject line>
----
-BODY: <HTML email body — use simple inline CSS styling, no external stylesheets>
+SUBJECT: <your short subject line here>
+
+<html>
+<body style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+<p>Hi {streamer_name},</p>
+<p>[Your personal message here - keep it short and friendly]</p>
+<p style="text-align: center;">
+<a href="https://syncstream.app" style="background: #6366f1; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; display: inline-block;">Try SyncStream for free</a>
+</p>
+</body>
+</html>
 """
 
     async with httpx.AsyncClient() as client:
@@ -47,8 +47,8 @@ BODY: <HTML email body — use simple inline CSS styling, no external stylesheet
                 "messages": [
                     {"role": "user", "content": prompt}
                 ],
-                "max_completion_tokens": 800,
-                "temperature": 0.8,
+                "max_completion_tokens": 600,
+                "temperature": 0.7,
             },
             timeout=60.0,
         )
@@ -60,23 +60,36 @@ BODY: <HTML email body — use simple inline CSS styling, no external stylesheet
 
 
 def _parse_email_response(content: str) -> GeneratedEmail:
-    subject = ""
-    body = ""
+    content = content.strip()
 
-    if "SUBJECT:" in content:
+    subject = "Let's sync — try SyncStream for your next watchalong!"
+    body = content
+
+    if "SUBJECT:" in content.upper():
         parts = content.split("SUBJECT:", 1)
-        after_subject = parts[1]
-        if "BODY:" in after_subject:
-            subject_part, body_part = after_subject.split("BODY:", 1)
-        else:
-            subject_part = after_subject
-            body_part = ""
-        subject = subject_part.strip()[:500]
-        body = body_part.strip()
-    else:
-        body = content.strip()
+        if len(parts) > 1:
+            after = parts[1]
+            lines = after.strip().split("\n")
+            subject_line = ""
+            html_start = -1
+            for i, line in enumerate(lines):
+                if "<html" in line.lower():
+                    html_start = i
+                    break
+                if line.strip() and not line.strip().startswith("<") and not line.strip().startswith("-"):
+                    subject_line = line.strip()
+            if html_start > 0:
+                body = "\n".join(lines[html_start:])
+                if subject_line:
+                    subject = subject_line[:500]
+            elif len(lines) > 1:
+                body = "\n".join(lines[1:])
 
-    if not body and not subject:
-        raise ValueError(f"Could not parse email response: {content!r}")
+    body = body.strip()
+    if not body.startswith("<html>"):
+        body = f"<html><body style=\"font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;\">{body}</body></html>"
+
+    if not subject:
+        subject = "Let's sync — try SyncStream for your next watchalong!"
 
     return GeneratedEmail(subject=subject, body=body)
