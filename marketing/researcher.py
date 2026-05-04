@@ -39,7 +39,7 @@ async def generate_outreach_email(
 
     message = client.messages.create(
         model=MINIMAX_MODEL,
-        max_tokens=2048,
+        max_tokens=1200,
         system="You are a helpful assistant. Output ONLY valid JSON.",
         messages=[
             {
@@ -50,17 +50,13 @@ async def generate_outreach_email(
     )
 
     logger.info(f"MiniMax message content blocks: {len(message.content)}")
-    for i, block in enumerate(message.content):
-        logger.info(f"Block {i}: type={block.type}")
+    text_content = ""
+    for block in message.content:
         if block.type == "text":
             text_content = block.text
             break
         elif block.type == "thinking":
-            logger.info(f"Thinking block found (skipping): {block.thinking[:200] if hasattr(block, 'thinking') else 'N/A'}")
-        else:
-            logger.info(f"Other block type: {block.type}")
-    else:
-        text_content = ""
+            logger.info(f"Thinking block (first 200 chars): {block.thinking[:200] if hasattr(block, 'thinking') else 'N/A'}")
 
     logger.info(f"MiniMax text response length: {len(text_content)}")
     return _parse_email_response(text_content, streamer_name, stream_title, game_name)
