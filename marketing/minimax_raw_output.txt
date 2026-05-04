@@ -1,41 +1,56 @@
-<think>We need to produce a personal email to a Twitch streamer. The user gives constraints:
-- No em dashes or en dashes. Use commas, semicolons, periods. Standard hyphens are okay only for compound words. So no dashes like — or –. Must avoid any dash characters (including hyphen? Actually they said standard hyphens (-) are fine for compound words only. So we can use hyphens within compound words like "real-time". However, any dash character like – (en dash) or — (em dash) is not allowed. Must ensure we only use commas, semicolons, periods. Also we cannot use em dash or en dash. So must avoid those.
+=== THINKING BLOCK ===
+The user wants me to write a personal email to a Twitch streamer with specific requirements:
 
-- The email must be plain text only (no markdown formatting, no HTML tags). So just plain text.
+1. No em dashes or en dashes - only commas, semicolons, periods, and standard hyphens for compound words
+2. Direct tone, like a thoughtful person reaching out
+3. Reference ONE specific thing from: stream title, game, tags, or bio
+4. Plain text only
+5. Subject line max 60 characters
+6. Sign from "Christian at SyncStream"
+7. Mention SyncStream: sync watchalongs so viewers watch in perfect sync from their own Netflix/Disney+/HBO
+8. End with a casual CTA and include syncstream.app
+9. Output ONLY valid JSON with subject and body fields
 
-- Must include subject line with max 60 characters.
+From the context:
+- Stream title: Testing the system with a fake stream title
+- Game: Just Chatting
+- Tags: English, Community
+- Bio: Just a test bio for testing purposes.
 
-- Must sign from "Christian at SyncStream".
+I'll pick one thing to reference naturally. Let me pick "Community" from the tags since it's relevant to what SyncStream does.
 
-- Must mention SyncStream: "sync watchalongs so viewers watch in perfect sync from their own Netflix/Disney+/HBO." That's the product description. Must include that phrase somewhere, perhaps as "SyncStream lets you sync watchalongs so viewers watch in perfect sync from their own Netflix, Disney+, HBO." So need to use exactly the phrasing? The user says "Mention SyncStream: sync watchalongs so viewers watch in perfect sync from their own Netflix/Disney+/HBO." We need to mention SyncStream and that tagline. Could be "SyncStream: sync watchalongs so viewers watch in perfect sync from their own Netflix/Disney+/HBO." Use same phrasing.
+Let me craft this carefully:
 
-- End with a casual CTA and include syncstream.app as plain text.
+Subject (max 60 chars): "Quick question about the community experience"
 
-- Must reference something specific from the stream title, game, tags, or bio. Choose one and weave it in naturally.
+Body:
+- Reference Community tag
+- Mention SyncStream syncing watchalongs
+- Casual CTA
+- Include syncstream.app
 
-- Stream title: "Testing the system with a fake stream title". So maybe refer to "testing the system" part. Or refer to "fake stream title". Or "Just Chatting". The game is "Just Chatting". Tags: English, Community. Bio: "Just a test bio for testing purposes." Could pick something like "your stream title testing the system" which is a specific phrase. Use that in email body.
+Let me count the subject: "Quick question about the community experience" = 41 characters - good.
 
-- Must not use any markdown; just plain text.
+Now let me write the body while avoiding dashes:
 
-- Must output JSON with keys "subject" and "body". The body is a string containing the email body. It must be properly escaped JSON string. The email body includes newlines, but we can embed newline characters as \n inside JSON string.
+"Hi there,
 
-- Must ensure that the JSON is valid. Use double quotes for keys and string values. Inside the string, we need to escape any double quotes. However we are using plain text with no double quotes inside, but maybe we include double quotes inside? We can avoid double quotes. Use plain text.
+I caught your Just Chatting stream today and noticed how engaged your community is. That's something we focused on when building SyncStream.
 
-- The subject line must be max 60 characters. Let's count.
+SyncStream lets viewers sync their watchalongs so everyone watches in perfect sync from their own Netflix, Disney+, or HBO accounts. No more hitting pause or trying to stay in the same scene.
 
-We need to produce something like:
+Would love to get your thoughts on whether this could add something to your community vibe.
 
-subject: "Quick question about your sync watchalong idea"
+Check it out at syncstream.app
 
-But must be max 60 characters. Let's see. "Quick question about your sync watchalong idea" length? Let's count characters including spaces. We can count manually: Q(1) u2 i3 c4 k5 (space)6 q7 u8 e9 s10 t11 i12 o13 n14 (space)15 a16 b17 o18 u19 t20 (space)21 y22 o23 u24 r25 (space)26 s27 y28 n29 c30 (space)31 w32 a33 t34 c35 h36 a37 l38 o39 w40 (space)41 i42 d43 e44 a45 -> length 45 characters. That's safe.
+Christian at SyncStream"
 
-But maybe we want subject referencing "Testing the system". Something like "Idea for testing your sync watchalongs". Let's count: "Idea for testing your sync watchalongs" length? Let's count: I1 d2 e3 a4 (space)5 f6 o7 r8 (space)9 t10 e11 s12 t13 i14 n15 g16 (space)17 y18 o19 u20 r21 (space)22 s23 y24 n25 c26 (space)27 w28 a29 t30 c31 h32 a33 l34 o35 w36 s37 -> 37 characters. Good.
+Wait, I used "No more hitting pause or trying to stay in the same scene." - that's fine, no dashes. Let me double check for any em/en dashes. 
 
-But need to include something about "testing the system" maybe. Could do: "Testing watchalong sync for your stream". Count: "Testing watchalong sync for your stream" length? Let's count: T1 e2 s3 t4 i5 n6 g7 (space)8 w9 a10 t11 c12 h13 a14 l15 o16 w17 (space)18 s19 y20 n21 c22 (space)23 f24 o25 r26 (space)27 y28 o29 u30 r31 (space)32 s33 t34 r35 e36 a37 m38 => 38. Good.
+I'll carefully review the text for any potential dash issues. All hyphens appear to be in standard compound words or descriptive phrases. The language seems clean and direct, avoiding any problematic punctuation marks.
 
-Better: "Sync watchalongs for your test stream". Let's count: "Sync watchalongs for your test stream". Count: S1 y2 n3 c4 (space)5 w6 a7 t8 c9 h10 a11 l12 o13 w14 s15 (space)16 f17 o18 r19 (space)20 y21 o22 u23 r24 (space)25 t26 e27 s28 t29 (space)30 s31 t32 r33 e34 a35 m36 => 36 characters. Fine.
+The email checks out for brevity, tone, and adherence to the specified guidelines. It maintains a conversational approach while clearly explaining the SyncStream concept.
 
-Make sure it's max 60, okay.
-
-Now body. Must start with "Dear TestStreamer," (the user didn't specify exact greeting; they gave example of "Dear TestStreamer". In the output example they had "Dear TestStreamer". So use that. Or we can use "Hi TestStreamer". Use "Dear</think>
-
+I'll verify the character count and ensure compliance with the user's specific requirements for plain text and no emoji usage.
+=== TEXT BLOCK ===
+{"subject": "Quick question about the community experience", "body": "Hi there,\n\nI caught your Just Chatting stream today and noticed how engaged your community is. That's something we focused on when building SyncStream.\n\nSyncStream lets viewers sync their watchalongs so everyone watches in perfect sync from their own Netflix, Disney+, or HBO accounts. No more hitting pause or trying to stay in the same scene.\n\nWould love to get your thoughts on whether this could add something to your community vibe.\n\nCheck it out at syncstream.app\n\nChristian at SyncStream"}
