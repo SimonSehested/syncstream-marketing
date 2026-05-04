@@ -51,10 +51,10 @@ Output a JSON object with exactly two fields: "subject" and "body". The body fie
         data = resp.json()
 
     content = data["choices"][0]["message"]["content"]
-    return _parse_email_response(content)
+    return _parse_email_response(content, streamer_name)
 
 
-def _parse_email_response(content: str) -> GeneratedEmail:
+def _parse_email_response(content: str, streamer_name: str = "there") -> GeneratedEmail:
     import json
 
     content = content.strip()
