@@ -1,9 +1,12 @@
 import json
+import logging
 
 import httpx
 from dataclasses import dataclass
 
 from .config import MINIMAX_API_BASE, MINIMAX_API_KEY, MINIMAX_MODEL, EMAIL_PROMPT
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -51,6 +54,7 @@ async def generate_outreach_email(
         data = resp.json()
 
     content = data["choices"][0]["message"]["content"]
+    logger.info(f"MiniMax raw response: {content[:1000]}")
     return _parse_email_response(content, streamer_name, stream_title, game_name)
 
 
