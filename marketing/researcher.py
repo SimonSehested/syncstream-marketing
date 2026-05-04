@@ -1,3 +1,5 @@
+import json
+
 import httpx
 from dataclasses import dataclass
 
@@ -13,7 +15,6 @@ class GeneratedEmail:
 async def generate_outreach_email(
     streamer_name: str,
     bio: str,
-    profile_image_url: str,
 ) -> GeneratedEmail:
     prompt = f"""Write a short, personal email to a Twitch streamer.
 
@@ -55,8 +56,6 @@ Output a JSON object with exactly two fields: "subject" and "body". The body fie
 
 
 def _parse_email_response(content: str, streamer_name: str = "there") -> GeneratedEmail:
-    import json
-
     content = content.strip()
 
     try:

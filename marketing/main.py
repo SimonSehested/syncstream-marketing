@@ -31,7 +31,6 @@ async def run(limit: int = 20, test_email: str = None) -> None:
             email = await generate_outreach_email(
                 streamer_name="Test Streamer",
                 bio="Just a test bio for testing purposes.",
-                profile_image_url="",
             )
         except Exception as e:
             logger.error(f"AI generation failed: {e}")
@@ -76,7 +75,6 @@ async def run(limit: int = 20, test_email: str = None) -> None:
             email = await generate_outreach_email(
                 streamer_name=streamer.display_name,
                 bio=streamer.bio,
-                profile_image_url=streamer.profile_image_url,
             )
         except Exception as e:
             logger.error(f"[{streamer.display_name}] AI generation failed: {e}")
