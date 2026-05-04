@@ -1,10 +1,10 @@
 import json
 import logging
 
-import httpx
+import anthropic
 from dataclasses import dataclass
 
-from .config import MINIMAX_API_BASE, MINIMAX_API_KEY, MINIMAX_MODEL, EMAIL_PROMPT
+from .config import MINIMAX_API_KEY, MINIMAX_MODEL, EMAIL_PROMPT
 
 logger = logging.getLogger(__name__)
 
@@ -32,41 +32,38 @@ async def generate_outreach_email(
         tags=", ".join(tags) if tags else "none",
     )
 
-    async with httpx.AsyncClient() as client:
-        resp = await client.post(
-            f"{MINIMAX_API_BASE}/v1/chat/completions",
-            headers={
-                "Authorization": f"Bearer {MINIMAX_API_KEY}",
-                "Content-Type": "application/json",
-            },
-            json={
-                "model": MINIMAX_MODEL,
-                "messages": [
-                    {"role": "system", "content": "You are a helpful assistant. Do NOT use any thinking tags like <think> or </thinking>. Do NOT reason out loud. Output ONLY valid JSON directly."},
-                    {"role": "user", "content": prompt}
-                ],
-                "max_completion_tokens": 1200,
-                "temperature": 0.8,
-            },
-            timeout=120.0,
-        )
-        resp.raise_for_status()
-        data = resp.json()
+    client = anthropic.Anthropic(
+        base_url="https://api.minimax.io/anthropic",
+        api_key=MINIMAX_API_KEY,
+    )
 
-    content = data["choices"][0]["message"]["content"]
-    logger.info(f"MiniMax response length: {len(content)}")
-    logger.info(f"MiniMax response START: {content[:500]}")
-    logger.info(f"MiniMax response END: {content[-500:]}")
-    return _parse_email_response(content, streamer_name, stream_title, game_name)
+    message = client.messages.create(
+        model=MINIMAX_MODEL,
+        max_tokens=1200,
+        system="You are a helpful assistant. Output ONLY valid JSON.",
+        messages=[
+            {
+                "role": "user",
+                "content": [{"type": "text", "text": prompt}]
+            }
+        ]
+    )
+
+    text_content = ""
+    for block in message.content:
+        if block.type == "text":
+            text_content = block.text
+            break
+
+    logger.info(f"MiniMax text response length: {len(text_content)}")
+    logger.info(f"MiniMax text response: {text_content[:500]}")
+    return _parse_email_response(text_content, streamer_name, stream_title, game_name)
 
 
 def _parse_email_response(content: str, streamer_name: str = "there", stream_title: str = "", game_name: str = "") -> GeneratedEmail:
     import re
     content = str(content).strip()
     
-    content = re.sub(r'<think>.*?', '', content, flags=re.DOTALL)
-    content = content.strip()
-
     subject = "Let's sync: try SyncStream"
     body = ""
 
