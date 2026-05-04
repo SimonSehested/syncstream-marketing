@@ -18,11 +18,6 @@ on:
         required: false
         default: 'false'
         type: string
-      minimax_test:
-        description: 'Run test_minimax.py to see raw MiniMax output'
-        required: false
-        default: 'false'
-        type: string
   schedule:
     - cron: '0 3 * * 0'
 
@@ -55,13 +50,6 @@ jobs:
         run: |
           if [ "${{ inputs.test_from_stream }}" = "true" ]; then
             python -m marketing.main --test-from-stream --test-email "${{ inputs.test_email }}"
-          elif [ "${{ inputs.minimax_test }}" = "true" ]; then
-            python marketing/run_test.py
-            git add marketing/minimax_raw_output.txt
-            git config user.name "GitHub Actions"
-            git config user.email "actions@github.com"
-            git commit -m "Add MiniMax raw output [skip ci]"
-            git push
           elif [ -n "${{ inputs.test_email }}" ]; then
             python -m marketing.main --test-email "${{ inputs.test_email }}"
           else
