@@ -56,6 +56,13 @@ jobs:
             python -m marketing.main --test-from-stream --test-email "${{ inputs.test_email }}"
           elif [ "${{ inputs.minimax_test }}" = "true" ]; then
             python marketing/test_minimax.py
+            if [ -f minimax_raw_output.txt ]; then
+              git add minimax_raw_output.txt
+              git config user.name "GitHub Actions"
+              git config user.email "actions@github.com"
+              git commit -m "Add MiniMax raw output [skip ci]" || true
+              git push || true
+            fi
           elif [ -n "${{ inputs.test_email }}" ]; then
             python -m marketing.main --test-email "${{ inputs.test_email }}"
           else

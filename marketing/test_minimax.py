@@ -3,6 +3,7 @@ import asyncio
 import os
 import json
 import re
+from datetime import datetime
 
 MINIMAX_API_KEY = os.getenv("MINIMAX_API_KEY")
 MINIMAX_API_BASE = "https://api.minimax.io"
@@ -35,7 +36,7 @@ REQUIREMENTS:
 - End with a casual CTA and include syncstream.app as plain text.
 
 OUTPUT FORMAT: Output ONLY valid JSON like this:
-{{"subject": "Your subject line", "body": "Dear {STREAMER_NAME},\n\nEmail body here...\n\nChristian at SyncStream"}}
+{{"subject": "Your subject line", "body": "Dear {STREAMER_NAME},\\n\\nEmail body here...\\n\\nChristian at SyncStream"}}
 
 Do not write anything else. Just output the JSON."""
 
@@ -63,34 +64,28 @@ async def main():
 
     content = data["choices"][0]["message"]["content"]
 
-    print("=" * 80)
+    # Save full response to file
+    output_file = "marketing/minimax_raw_output.txt"
+    with open(output_file, "w", encoding="utf-8") as f:
+        f.write("=" * 80 + "\n")
+        f.write("MINIMAX RAW OUTPUT\n")
+        f.write(f"Timestamp: {datetime.now().isoformat()}\n")
+        f.write(f"Response length: {len(content)} characters\n")
+        f.write("=" * 80 + "\n\n")
+        f.write(content)
+        f.write("\n" + "=" * 80 + "\n")
+        f.write(f"END OF RESPONSE\n")
+        f.write("=" * 80 + "\n")
+
+    print(f"Full output saved to {output_file}")
+    print(f"Response length: {len(content)} characters")
+
+    # Also print to stdout for logging
+    print("\n" + "=" * 80)
     print("MINIMAX RAW OUTPUT:")
     print("=" * 80)
     print(content)
     print("=" * 80)
-    print(f"Response length: {len(content)} characters")
-    print("=" * 80)
-
-    print("\nTrying to extract JSON...")
-
-    try:
-        parsed = json.loads(content)
-        print(f"Direct JSON parse SUCCESS: {parsed}")
-        return
-    except json.JSONDecodeError as e:
-        print(f"Direct JSON parse FAILED: {e}")
-
-    stripped = re.sub(r'<think>.*?</thinking>', '', content, flags=re.DOTALL)
-    stripped = stripped.strip()
-    print(f"\nAfter stripping thinking tags, length: {len(stripped)}")
-    print(f"First 500 chars: {stripped[:500]}")
-
-    try:
-        parsed = json.loads(stripped)
-        print(f"JSON parse after stripping thinking tags SUCCESS: {parsed}")
-        return
-    except json.JSONDecodeError as e:
-        print(f"JSON parse after stripping thinking tags FAILED: {e}")
 
 if __name__ == "__main__":
     asyncio.run(main())
