@@ -25,15 +25,17 @@ STREAMER CONTEXT:
 - Stream title: {stream_title}
 - Game: {game_name}
 - Tags: {tags}
-- Bio: {bio}
 
 REQUIREMENTS:
-- Reference something specific from the stream title, game, tags, or bio. Pick ONE thing and weave it in naturally.
+- Reference something specific from the stream title, game, or tags. Pick ONE thing and weave it in naturally.
 - Plain text only.
 - Subject line: max 60 characters.
 - Sign from "Christian at SyncStream".
-- Mention SyncStream: sync watchalongs so viewers watch in perfect sync from their own Netflix/Disney+/HBO.
-- End with a casual CTA and include syncstream.app as plain text.
+- Always mention SyncStream: sync watchalongs so viewers watch in perfect sync from their own Netflix/Disney+/HBO.
+- Always mention the Chrome extension: https://chromewebstore.google.com/detail/syncstream/nbnbocdddjjadigghbmeedieihaocafo
+- Always include syncstream.app as plain text.
+- Never mention the person's bio or reveal where you got the information from.
+- End with a casual CTA.
 
 OUTPUT FORMAT: Output ONLY valid JSON like this:
 {{"subject": "Your subject line", "body": "Dear {streamer_name},\n\nEmail body here...\n\nChristian at SyncStream"}}
