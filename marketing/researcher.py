@@ -54,7 +54,9 @@ async def generate_outreach_email(
         data = resp.json()
 
     content = data["choices"][0]["message"]["content"]
-    logger.info(f"MiniMax response preview: {content[:200]}")
+    logger.info(f"MiniMax response length: {len(content)}")
+    logger.info(f"MiniMax response START: {content[:500]}")
+    logger.info(f"MiniMax response END: {content[-500:]}")
     return _parse_email_response(content, streamer_name, stream_title, game_name)
 
 
