@@ -82,20 +82,15 @@ def _parse_email_response(content: str) -> GeneratedEmail:
     body = "\n".join(body_lines).strip()
 
     if not body or len(body) < 20:
-        body = f"""Hi [Name],
+        body = "Hi [Name],\n\nI love your stream and the community you've built. I've been working on a tool called SyncStream that I think you'd really like — it lets you host watchalongs where everyone watches in perfect sync from their own Netflix or Disney+ account.\n\nWould love for you to try it out for your next watchalong!\n\nChristian at SyncStream"
 
-I love your stream and the community you've built. I've been working on a tool called SyncStream that I think you'd really like — it lets you host watchalongs where everyone watches in perfect sync from their own Netflix or Disney+ account.
-
-Would love for you to try it out for your next watchalong!
-
-Christian at SyncStream"""
-
-    html_body = f"""
-<html>
+    nl_double = '\n\n'
+    nl_single = '\n'
+    body_html = body.replace(nl_double, '</p><p style="margin-bottom: 16px;">').replace(nl_single, '<br>')
+    html_body = f"""<html>
 <body style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; line-height: 1.6;">
-{body.replace('\n\n', '</p><p style="margin-bottom: 16px;">').replace('\n', '<br>')}
+{body_html}
 </body>
-</html>
-"""
+</html>"""
 
     return GeneratedEmail(subject=subject, body=html_body)
