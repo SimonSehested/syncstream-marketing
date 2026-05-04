@@ -40,7 +40,7 @@ async def generate_outreach_email(
     message = client.messages.create(
         model=MINIMAX_MODEL,
         max_tokens=1200,
-        system="You are a helpful assistant. Output ONLY valid JSON.",
+        system="You are a helpful assistant. Do NOT use any thinking tags like <think> or </thinking>. Do NOT reason out loud. Output ONLY valid JSON directly.",
         messages=[
             {
                 "role": "user",
