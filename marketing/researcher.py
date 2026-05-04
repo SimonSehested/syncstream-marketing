@@ -52,14 +52,24 @@ async def generate_outreach_email(
         resp.raise_for_status()
         data = resp.json()
 
-    logger.info(f"API response keys: {list(data.keys())}")
-    logger.info(f"Choices count: {len(data.get('choices', []))}")
+    logger.info(f"Full API response type: {type(data)}, keys: {list(data.keys()) if isinstance(data, dict) else 'N/A'}")
     
-    message = data["choices"][0]["message"]
-    logger.info(f"Message keys: {list(message.keys())}")
+    if not isinstance(data, dict):
+        logger.error(f"API response is not a dict: {type(data)}, value: {str(data)[:500]}")
+        raise TypeError(f"API response is {type(data)}, expected dict")
     
-    content = message["content"]
-    logger.info(f"MiniMax raw response: {content[:800]}")
+    choices = data.get("choices", [])
+    logger.info(f"Choices count: {len(choices)}")
+    
+    if not choices:
+        logger.error(f"No choices in API response")
+        raise ValueError("No choices in API response")
+    
+    message = choices[0].get("message", {})
+    logger.info(f"Message type: {type(message)}, keys: {list(message.keys()) if isinstance(message, dict) else 'N/A'}")
+    
+    content = message.get("content", "")
+    logger.info(f"Content type: {type(content)}, preview: {str(content)[:200]}")
     return _parse_email_response(content, streamer_name, stream_title, game_name)
 
 
