@@ -71,7 +71,7 @@ def _parse_email_response(content: str) -> GeneratedEmail:
         else:
             subject_part = after_subject
             body_part = ""
-        subject = subject_part.strip()
+        subject = subject_part.strip()[:500]
         body = body_part.strip()
     else:
         body = content.strip()
