@@ -1,0 +1,49 @@
+MiniMax Model: MiniMax-M2.7
+Response Length: 3166 characters
+
+================================================================================
+START AF RESPONSE (første ~500 tegn):
+================================================================================
+
+<think>The user wants me to write a personal email to a Twitch streamer. Let me break down the requirements:
+
+1. CRITICAL: No em dashes or en dashes. Use commas, semicolons, or periods instead. Standard hyphens are fine for compound words only.
+2. TONE: Direct, thoughtful person reaching out, not a marketer.
+3. ...
+
+[MASSER AF TÆNKE-TAGS HER - masser af reasoning omkring reglerne og email-skabelon]
+
+================================================================================
+SLUT AF RESPONSE (sidste ~500 tegn):
+================================================================================
+
+...Would love to hear what you think. Just want to loop you in if you think it might be useful for your community.
+
+Christian at SyncStream
+
+Check us out at syncstream.app
+
+================================================================================
+KONKLUSION:
+================================================================================
+
+MiniMax-M2.7 svarer IKKE med JSON. Den svarer med:
+
+1. Tænke-tags: <think> ... </thinking> med reasoning/process
+2. Derefter plain text email (ingen JSON struktur)
+
+Emailen der blev skrevet var faktisk ret god - personlig og fulgte reglerne.
+Men modellen nægter at outputte JSON formatet vi bad om.
+
+================================================================================
+MULIGE LØSNINGER:
+================================================================================
+
+1. SKIFT MODEL: Prøv MiniMax-M2.5 (reasoning model, burde følge instruktioner bedre)
+
+2. PARSE PLAIN TEXT: I stedet for at lede efter JSON, så find "Dear {streamer}"
+   og stop ved "Christian at SyncStream"
+
+3. BRUG IKKE JSON: Bed specifikt om plain text email uden JSON format
+
+4. FORBEDR PROMPT: Sig mere eksplicit "Output ONLY the email, no thinking, no explanation"
