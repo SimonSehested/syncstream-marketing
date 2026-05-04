@@ -59,7 +59,11 @@ async def generate_outreach_email(
 
 
 def _parse_email_response(content: str, streamer_name: str = "there", stream_title: str = "", game_name: str = "") -> GeneratedEmail:
+    import re
     content = str(content).strip()
+    
+    content = re.sub(r'<think>.*?', '', content, flags=re.DOTALL)
+    content = content.strip()
 
     subject = "Let's sync: try SyncStream"
     body = ""
