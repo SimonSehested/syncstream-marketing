@@ -26,14 +26,8 @@ Rules:
 - Sign it from "Christian at SyncStream"
 - Mention what SyncStream does briefly (sync watchalongs so viewers watch in perfect sync from their own Netflix/Disney+/HBO)
 - End with a casual CTA to try it
-- Output ONLY the email — nothing else
 
-Output format:
-SUBJECT: <subject line>
-
-Dear {streamer_name},
-
-<email body>"""
+Output a JSON object with exactly two fields: "subject" and "body". The body field must contain the complete email starting with "Dear {streamer_name}," and ending with the signature "Christian at SyncStream". Output NOTHING else — no explanation, no reasoning, no thinking, just the JSON."""
 
     async with httpx.AsyncClient() as client:
         resp = await client.post(
@@ -49,6 +43,7 @@ Dear {streamer_name},
                 ],
                 "max_completion_tokens": 400,
                 "temperature": 0.8,
+                "response_format": {"type": "json_object"},
             },
             timeout=60.0,
         )
@@ -60,53 +55,21 @@ Dear {streamer_name},
 
 
 def _parse_email_response(content: str) -> GeneratedEmail:
+    import json
+
     content = content.strip()
 
-    lines = content.split("\n")
-    subject = "Let's sync — try SyncStream!"
-    body_lines = []
-    in_email = False
-
-    for i, line in enumerate(lines):
-        upper = line.upper().strip()
-
-        if upper.startswith("SUBJECT:") and i < 3:
-            subject = line[len("SUBJECT:"):].strip()[:100]
-            continue
-
-        if line.strip().startswith("Dear"):
-            in_email = True
-
-        if in_email:
-            body_lines.append(line)
-
-        garbage_starts = [
-            "let me count",
-            "actually wait",
-            "actually re-reading",
-            "this looks good",
-            "word count",
-            "subject line",
-            "under 100",
-            "under 60",
-            "good under",
-            "that's ",
-            "you should",
-            "re-reading",
-            "<system",
-        ]
-        lower_line = line.lower().strip()
-        if any(lower_line.startswith(g) for g in garbage_starts):
-            body_lines = body_lines[:-1]
-            break
-
-    body = "\n".join(body_lines).strip()
+    try:
+        parsed = json.loads(content)
+        subject = parsed.get("subject", "Let's sync — try SyncStream!")
+        body = parsed.get("body", "")
+    except json.JSONDecodeError:
+        subject = "Let's sync — try SyncStream!"
+        body = ""
 
     if not body or len(body) < 20:
-        body = "Hi [Name],\n\nI love your stream and the community you've built. I've been working on a tool called SyncStream that I think you'd really like — it lets you host watchalongs where everyone watches in perfect sync from their own Netflix or Disney+ account.\n\nWould love for you to try it out for your next watchalong!\n\nChristian at SyncStream"
-
-    if "Dear [Name]" in body or "Dear Test Streamer" in body:
-        body = body.replace("Dear [Name]", "Hi there").replace("Dear Test Streamer", "Hi there")
+        body = f"Hi {streamer_name},\n\nI love your stream and the community you've built. I've been working on a tool called SyncStream that I think you'd really like — it lets you host watchalongs where everyone watches in perfect sync from their own Netflix or Disney+ account.\n\nWould love for you to try it out for your next watchalong!\n\nChristian at SyncStream"
+        subject = "Let's sync — try SyncStream!"
 
     nl_double = '\n\n'
     nl_single = '\n'
