@@ -1,12 +1,7 @@
-import httpx
-import asyncio
+import anthropic
 import os
-import json
-import re
 
 MINIMAX_API_KEY = os.getenv("MINIMAX_API_KEY")
-MINIMAX_API_BASE = "https://api.minimax.io"
-MINIMAX_MODEL = "MiniMax-M2.7"
 
 STREAMER_NAME = "TestStreamer"
 BIO = "Just a test bio for testing purposes."
@@ -39,37 +34,32 @@ OUTPUT FORMAT: Output ONLY valid JSON like this:
 
 Do not write anything else. Just output the JSON."""
 
-async def main():
-    async with httpx.AsyncClient() as client:
-        resp = await client.post(
-            f"{MINIMAX_API_BASE}/v1/chat/completions",
-            headers={
-                "Authorization": f"Bearer {MINIMAX_API_KEY}",
-                "Content-Type": "application/json",
-            },
-            json={
-                "model": MINIMAX_MODEL,
-                "messages": [
-                    {"role": "system", "content": "You are a helpful assistant. Do NOT use any thinking tags like <think> or </thinking>. Do NOT reason out loud. Output ONLY valid JSON directly."},
-                    {"role": "user", "content": PROMPT}
-                ],
-                "max_completion_tokens": 1200,
-                "temperature": 0.8,
-            },
-            timeout=120.0,
-        )
-        resp.raise_for_status()
-        data = resp.json()
+def main():
+    client = anthropic.Anthropic(
+        base_url="https://api.minimax.io/anthropic",
+        api_key=MINIMAX_API_KEY,
+    )
 
-    content = data["choices"][0]["message"]["content"]
+    message = client.messages.create(
+        model="MiniMax-M2.7",
+        max_tokens=1200,
+        system="You are a helpful assistant. Output ONLY valid JSON.",
+        messages=[
+            {
+                "role": "user",
+                "content": [{"type": "text", "text": PROMPT}]
+            }
+        ]
+    )
 
-    # Save to file in marketing directory
     with open("marketing/minimax_raw_output.txt", "w", encoding="utf-8") as f:
-        f.write(content)
+        for block in message.content:
+            if block.type == "thinking":
+                f.write(f"=== THINKING BLOCK ===\n{block.thinking}\n")
+            elif block.type == "text":
+                f.write(f"=== TEXT BLOCK ===\n{block.text}\n")
 
-    print(f"Saved {len(content)} chars to marketing/minimax_raw_output.txt")
-    print(f"\n=== FIRST 500 CHARS ===\n{content[:500]}")
-    print(f"\n=== LAST 500 CHARS ===\n{content[-500:]}")
+    print("Done. Check marketing/minimax_raw_output.txt")
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
