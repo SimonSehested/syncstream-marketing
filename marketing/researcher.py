@@ -66,10 +66,17 @@ def _parse_email_response(content: str, streamer_name: str = "there", stream_tit
 
     try:
         parsed = json.loads(content)
-        subject = str(parsed.get("subject", subject))
-        body = str(parsed.get("body", ""))
-    except (json.JSONDecodeError, KeyError, TypeError) as e:
-        logger.info(f"JSON parse failed: {e}, trying line-by-line extraction")
+        logger.info(f"Parsed type: {type(parsed)}, keys: {list(parsed.keys()) if isinstance(parsed, dict) else 'N/A'}")
+        
+        if isinstance(parsed, dict):
+            subject = str(parsed.get("subject", subject))
+            body = str(parsed.get("body", ""))
+        else:
+            logger.info(f"Parsed is not a dict, trying line-by-line")
+            raise json.JSONDecodeError("Not a dict", content, 0)
+            
+    except (json.JSONDecodeError, KeyError, TypeError, AttributeError) as e:
+        logger.info(f"Parse failed: {type(e).__name__}: {e}, trying line-by-line")
         lines = content.split("\n")
         body_lines = []
         in_body = False
