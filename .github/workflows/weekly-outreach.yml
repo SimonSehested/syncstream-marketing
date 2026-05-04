@@ -13,6 +13,11 @@ on:
         required: false
         default: ''
         type: string
+      test_from_stream:
+        description: 'Fetch a random real streamer and send email to test-email address'
+        required: false
+        default: 'false'
+        type: string
   schedule:
     - cron: '0 3 * * 0'
 
@@ -42,7 +47,9 @@ jobs:
           MINIMAX_API_KEY: ${{ secrets.MINIMAX_API_KEY }}
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
         run: |
-          if [ -n "${{ inputs.test_email }}" ]; then
+          if [ "${{ inputs.test_from_stream }}" = "true" ]; then
+            python -m marketing.main --test-from-stream --test-email "${{ inputs.test_email }}"
+          elif [ -n "${{ inputs.test_email }}" ]; then
             python -m marketing.main --test-email "${{ inputs.test_email }}"
           else
             python -m marketing.main --limit ${{ inputs.limit || '20' }}
