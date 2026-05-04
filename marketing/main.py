@@ -22,8 +22,44 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-async def run(limit: int = 20, test_email: str = None) -> None:
-    logger.info(f"Starting outreach run (limit={limit}, test_email={test_email})")
+async def run(limit: int = 20, test_email: str = None, test_from_stream: bool = False) -> None:
+    logger.info(f"Starting outreach run (limit={limit}, test_email={test_email}, test_from_stream={test_from_stream})")
+
+    if test_from_stream:
+        logger.info("TEST MODE: Fetching one real streamer, generating email, sending to test address")
+        if not TWITCH_CLIENT_ID or not TWITCH_CLIENT_SECRET:
+            logger.error("TWITCH_CLIENT_ID or TWITCH_CLIENT_SECRET not set")
+            sys.exit(1)
+        if not MINIMAX_API_KEY:
+            logger.error("MINIMAX_API_KEY not set")
+            sys.exit(1)
+
+        scraper = TwitchScraper(TWITCH_CLIENT_ID, TWITCH_CLIENT_SECRET)
+        all_streamers = await scraper.get_top_streamers(limit=100)
+        if not all_streamers:
+            logger.error("No streamers fetched")
+            sys.exit(1)
+
+        import random
+        streamer = random.choice(all_streamers)
+        logger.info(f"Selected streamer: {streamer.display_name} (bio: {streamer.bio[:80]}...)")
+
+        try:
+            email = await generate_outreach_email(
+                streamer_name=streamer.display_name,
+                bio=streamer.bio,
+            )
+        except Exception as e:
+            logger.error(f"AI generation failed: {e}")
+            sys.exit(1)
+
+        success = send_email(test_email, email.subject, email.body)
+        if success:
+            logger.info(f"TEST EMAIL SENT to {test_email}")
+        else:
+            logger.error(f"TEST EMAIL FAILED to {test_email}")
+            sys.exit(1)
+        return
 
     if test_email:
         logger.info(f"TEST MODE: Generating and sending single email to {test_email}")
@@ -114,8 +150,9 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="SyncStream weekly outreach")
     parser.add_argument("--limit", type=int, default=20, help="Max streamers to process")
     parser.add_argument("--test-email", type=str, default=None, help="Send test email to this address instead of running full outreach")
+    parser.add_argument("--test-from-stream", action="store_true", default=False, help="Fetch a random real streamer and send their generated email to test-email address")
     args = parser.parse_args()
-    asyncio.run(run(args.limit, args.test_email))
+    asyncio.run(run(args.limit, args.test_email, args.test_from_stream))
 
 
 if __name__ == "__main__":
