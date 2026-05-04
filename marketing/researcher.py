@@ -59,15 +59,17 @@ async def generate_outreach_email(
 
 def _parse_email_response(content: str, streamer_name: str = "there", stream_title: str = "", game_name: str = "") -> GeneratedEmail:
     content = content.strip()
+    logger.info(f"Parsing content: {content[:500]}")
 
     subject = "Let's sync: try SyncStream"
     body = ""
 
     try:
         parsed = json.loads(content)
-        subject = parsed.get("subject", subject)
-        body = parsed.get("body", "")
-    except json.JSONDecodeError:
+        subject = str(parsed.get("subject", subject))
+        body = str(parsed.get("body", ""))
+    except (json.JSONDecodeError, KeyError, TypeError) as e:
+        logger.info(f"JSON parse failed: {e}, trying line-by-line extraction")
         lines = content.split("\n")
         body_lines = []
         in_body = False
