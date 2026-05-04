@@ -49,31 +49,13 @@ async def generate_outreach_email(
         ]
     )
 
-    logger.info(f"MiniMax message content blocks: {len(message.content)}")
     text_content = ""
-    thinking_json = ""
     for block in message.content:
         if block.type == "text":
             text_content = block.text
-        elif block.type == "thinking":
-            thinking_text = getattr(block, 'thinking', '') or ''
-            logger.info(f"Thinking block (first 300 chars): {thinking_text[:300]}")
-            thinking_json = thinking_text
-
-    if not text_content and thinking_json:
-        logger.info("No text block found, using thinking block content")
-        text_content = thinking_json
+            break
 
     logger.info(f"MiniMax text response length: {len(text_content)}")
-    logger.info(f"MiniMax text response: {text_content[:1000]}")
-
-    with open("marketing/minimax_raw_output.txt", "w", encoding="utf-8") as f:
-        for block in message.content:
-            if block.type == "text":
-                f.write(f"=== TEXT BLOCK ===\n{block.text}\n")
-            elif block.type == "thinking":
-                f.write(f"=== THINKING BLOCK ===\n{block.thinking}\n")
-
     return _parse_email_response(text_content, streamer_name, stream_title, game_name)
 
 
