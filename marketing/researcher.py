@@ -46,7 +46,6 @@ async def generate_outreach_email(
                 ],
                 "max_completion_tokens": 1200,
                 "temperature": 0.8,
-                "response_format": {"type": "json_object"},
             },
             timeout=120.0,
         )
@@ -61,13 +60,27 @@ async def generate_outreach_email(
 def _parse_email_response(content: str, streamer_name: str = "there", stream_title: str = "", game_name: str = "") -> GeneratedEmail:
     content = content.strip()
 
+    subject = "Let's sync: try SyncStream"
+    body = ""
+
     try:
         parsed = json.loads(content)
-        subject = parsed.get("subject", "Let's sync: try SyncStream")
+        subject = parsed.get("subject", subject)
         body = parsed.get("body", "")
     except json.JSONDecodeError:
-        subject = "Let's sync: try SyncStream"
-        body = ""
+        lines = content.split("\n")
+        body_lines = []
+        in_body = False
+        for line in lines:
+            upper = line.upper().strip()
+            if upper.startswith("SUBJECT:"):
+                subject = line[len("SUBJECT:"):].strip()
+                continue
+            if "DEAR " in upper or upper.startswith("DEAR"):
+                in_body = True
+            if in_body:
+                body_lines.append(line)
+        body = "\n".join(body_lines).strip()
 
     if not body or len(body) < 50:
         personal_detail = stream_title or game_name or "your stream"

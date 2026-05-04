@@ -35,4 +35,7 @@ REQUIREMENTS:
 - Mention SyncStream: sync watchalongs so viewers watch in perfect sync from their own Netflix/Disney+/HBO.
 - End with a casual CTA and include syncstream.app as plain text.
 
-OUTPUT: JSON with two fields only: "subject" and "body". Body starts with "Dear {streamer_name}," and ends with "Christian at SyncStream". Nothing else.""")
+OUTPUT FORMAT: Output ONLY valid JSON like this:
+{{"subject": "Your subject line", "body": "Dear {streamer_name},\n\nEmail body here...\n\nChristian at SyncStream"}}
+
+Do not write anything else. Just output the JSON."""
