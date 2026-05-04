@@ -15,24 +15,24 @@ async def generate_outreach_email(
     bio: str,
     profile_image_url: str,
 ) -> GeneratedEmail:
-    prompt = f"""Write a SHORT email (max 150 words) to a Twitch streamer named "{streamer_name}".
+    prompt = f"""Write a short, personal email to a Twitch streamer.
 
-Write ONLY the subject line and email body. NOTHING else. No explanations. No thinking. No markdown headers.
+Keep it casual and friendly — like a fan reaching out, not a company selling something.
 
-Subject line must be max 100 characters.
-Email body must be plain HTML with inline CSS only. No external stylesheets.
+Rules:
+- Max 100 words
+- Plain text only (no HTML, no formatting)
+- Subject line: max 60 characters
+- Sign it from "Christian at SyncStream"
+- Mention what SyncStream does briefly (sync watchalongs so viewers watch in perfect sync from their own Netflix/Disney+/HBO)
+- End with a casual CTA to try it
 
-SUBJECT: <your short subject line here>
+Output format:
+SUBJECT: <subject line>
 
-<html>
-<body style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-<p>Hi {streamer_name},</p>
-<p>[Your personal message here - keep it short and friendly]</p>
-<p style="text-align: center;">
-<a href="https://syncstream.app" style="background: #6366f1; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; display: inline-block;">Try SyncStream for free</a>
-</p>
-</body>
-</html>
+Dear {streamer_name},
+
+<email body>
 """
 
     async with httpx.AsyncClient() as client:
@@ -47,8 +47,8 @@ SUBJECT: <your short subject line here>
                 "messages": [
                     {"role": "user", "content": prompt}
                 ],
-                "max_completion_tokens": 600,
-                "temperature": 0.7,
+                "max_completion_tokens": 400,
+                "temperature": 0.8,
             },
             timeout=60.0,
         )
@@ -62,34 +62,40 @@ SUBJECT: <your short subject line here>
 def _parse_email_response(content: str) -> GeneratedEmail:
     content = content.strip()
 
-    subject = "Let's sync — try SyncStream for your next watchalong!"
-    body = content
+    lines = content.split("\n")
+    subject = "Let's sync — try SyncStream!"
+    body_lines = []
 
-    if "SUBJECT:" in content.upper():
-        parts = content.split("SUBJECT:", 1)
-        if len(parts) > 1:
-            after = parts[1]
-            lines = after.strip().split("\n")
-            subject_line = ""
-            html_start = -1
-            for i, line in enumerate(lines):
-                if "<html" in line.lower():
-                    html_start = i
-                    break
-                if line.strip() and not line.strip().startswith("<") and not line.strip().startswith("-"):
-                    subject_line = line.strip()
-            if html_start > 0:
-                body = "\n".join(lines[html_start:])
-                if subject_line:
-                    subject = subject_line[:500]
-            elif len(lines) > 1:
-                body = "\n".join(lines[1:])
+    for i, line in enumerate(lines):
+        upper_line = line.upper()
+        if upper_line.startswith("SUBJECT:") and i < 3:
+            subject = line[len("SUBJECT:"):].strip()[:100]
+            continue
+        if line.strip().startswith("Dear"):
+            body_lines = lines[i:]
+            break
+        if "<" in line and ">" in line and "@" in line:
+            continue
+        if line.strip() and not line.upper().startswith("SUBJECT"):
+            body_lines.append(line)
 
-    body = body.strip()
-    if not body.startswith("<html>"):
-        body = f"<html><body style=\"font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;\">{body}</body></html>"
+    body = "\n".join(body_lines).strip()
 
-    if not subject:
-        subject = "Let's sync — try SyncStream for your next watchalong!"
+    if not body or len(body) < 20:
+        body = f"""Hi [Name],
 
-    return GeneratedEmail(subject=subject, body=body)
+I love your stream and the community you've built. I've been working on a tool called SyncStream that I think you'd really like — it lets you host watchalongs where everyone watches in perfect sync from their own Netflix or Disney+ account.
+
+Would love for you to try it out for your next watchalong!
+
+Christian at SyncStream"""
+
+    html_body = f"""
+<html>
+<body style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; line-height: 1.6;">
+{body.replace('\n\n', '</p><p style="margin-bottom: 16px;">').replace('\n', '<br>')}
+</body>
+</html>
+"""
+
+    return GeneratedEmail(subject=subject, body=html_body)
