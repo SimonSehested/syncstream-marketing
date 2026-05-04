@@ -65,6 +65,15 @@ async def generate_outreach_email(
         text_content = thinking_json
 
     logger.info(f"MiniMax text response length: {len(text_content)}")
+    logger.info(f"MiniMax text response: {text_content[:1000]}")
+
+    with open("marketing/minimax_raw_output.txt", "w", encoding="utf-8") as f:
+        for block in message.content:
+            if block.type == "text":
+                f.write(f"=== TEXT BLOCK ===\n{block.text}\n")
+            elif block.type == "thinking":
+                f.write(f"=== THINKING BLOCK ===\n{block.thinking}\n")
+
     return _parse_email_response(text_content, streamer_name, stream_title, game_name)
 
 
