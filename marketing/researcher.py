@@ -45,7 +45,7 @@ async def generate_outreach_email(
                 "temperature": 0.8,
                 "response_format": {"type": "json_object"},
             },
-            timeout=60.0,
+            timeout=120.0,
         )
         resp.raise_for_status()
         data = resp.json()
