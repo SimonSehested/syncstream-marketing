@@ -1,6 +1,5 @@
 import json
 import logging
-import traceback
 
 import httpx
 from dataclasses import dataclass
@@ -78,8 +77,20 @@ def _parse_email_response(content: str, streamer_name: str = "there", stream_tit
         
         if isinstance(parsed, dict):
             logger.info(f"Dict keys: {list(parsed.keys())}")
-            subject = str(parsed.get("subject", parsed.get('"subject"', subject)))
-            body = str(parsed.get("body", parsed.get('"body"', "")))
+            try:
+                subject = str(parsed["subject"])
+            except KeyError:
+                try:
+                    subject = str(parsed['"subject"'])
+                except KeyError:
+                    subject = "Let's sync: try SyncStream"
+            try:
+                body = str(parsed["body"])
+            except KeyError:
+                try:
+                    body = str(parsed['"body"'])
+                except KeyError:
+                    body = ""
         elif isinstance(parsed, str):
             logger.info(f"Parsed is string, re-parsing: {parsed[:200]}")
             inner = json.loads(parsed)
@@ -91,7 +102,7 @@ def _parse_email_response(content: str, streamer_name: str = "there", stream_tit
             raise json.JSONDecodeError("Not a dict or str", content, 0)
             
     except (json.JSONDecodeError, KeyError, TypeError, AttributeError) as e:
-        logger.info(f"Parse failed: {type(e).__name__}: {e}, traceback: {traceback.format_exc()[:500]}, trying line-by-line")
+        logger.info(f"Parse failed: {type(e).__name__}: {e}, trying line-by-line")
         lines = content.split("\n")
         body_lines = []
         in_body = False
