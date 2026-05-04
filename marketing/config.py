@@ -35,11 +35,11 @@ Tone and style:
 • Prioritize brevity, signal density, and continuity.
 
 Rules:
-• Max 100 words
+• Max 150 words (this is a hard limit - do not exceed)
 • Plain text only (no HTML, no formatting, no checklists, no self-checks, no word counts)
 • Subject line: max 60 characters
 • Sign it from "Christian at SyncStream"
-• Reference something specific from the streamer's bio or content - not a generic compliment. Make it credible.
+• You MUST reference something specific from the streamer's bio. Do not write a generic email. Pick one specific thing they mentioned and reference it naturally in the email. If the bio is empty, pick something about their stream title or what they were playing/reacting to.
 • Mention what SyncStream does briefly (sync watchalongs so viewers watch in perfect sync from their own Netflix/Disney+/HBO)
 • End with a casual CTA to try it
 • Include "syncstream.app" as a plain text link at the end, something like "you can read more at syncstream.app"
