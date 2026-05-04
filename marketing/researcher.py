@@ -21,19 +21,19 @@ Keep it casual and friendly — like a fan reaching out, not a company selling s
 
 Rules:
 - Max 100 words
-- Plain text only (no HTML, no formatting)
+- Plain text only (no HTML, no formatting, no checklists)
 - Subject line: max 60 characters
 - Sign it from "Christian at SyncStream"
 - Mention what SyncStream does briefly (sync watchalongs so viewers watch in perfect sync from their own Netflix/Disney+/HBO)
 - End with a casual CTA to try it
+- Output ONLY the email — no commentary, no notes, no self-checks
 
 Output format:
 SUBJECT: <subject line>
 
 Dear {streamer_name},
 
-<email body>
-"""
+<email body>"""
 
     async with httpx.AsyncClient() as client:
         resp = await client.post(
@@ -83,6 +83,14 @@ def _parse_email_response(content: str) -> GeneratedEmail:
 
     if not body or len(body) < 20:
         body = "Hi [Name],\n\nI love your stream and the community you've built. I've been working on a tool called SyncStream that I think you'd really like — it lets you host watchalongs where everyone watches in perfect sync from their own Netflix or Disney+ account.\n\nWould love for you to try it out for your next watchalong!\n\nChristian at SyncStream"
+
+    check_idx = body.find("Let me check:")
+    if check_idx > 0:
+        body = body[:check_idx].strip()
+
+    check_idx2 = body.find("This looks good")
+    if check_idx2 > 0:
+        body = body[:check_idx2].strip()
 
     nl_double = '\n\n'
     nl_single = '\n'
