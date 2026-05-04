@@ -63,6 +63,8 @@ async def run(limit: int = 20, test_email: str = None, test_from_stream: bool = 
         success = send_email(test_email, email.subject, email.body)
         if success:
             logger.info(f"TEST EMAIL SENT to {test_email}")
+            logger.info(f"  Subject: {email.subject}")
+            logger.info(f"  Body preview: {email.body[:800]}...")
         else:
             logger.error(f"TEST EMAIL FAILED to {test_email}")
             sys.exit(1)
