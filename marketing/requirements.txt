@@ -1,0 +1,3 @@
+httpx
+resend
+python-dotenv

@@ -1,0 +1,58 @@
+name: Weekly Streamer Outreach
+
+on:
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: 'Max streamers to process'
+        required: false
+        default: '20'
+        type: string
+      test_email:
+        description: 'Test email address (skip scraping, send single test email)'
+        required: false
+        default: ''
+        type: string
+  schedule:
+    - cron: '0 3 * * 0'
+
+jobs:
+  outreach:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            marketing
+            contacted_streamers.csv
+            .github
+          sparse-checkout-cone-mode: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install httpx resend python-dotenv
+
+      - name: Run outreach
+        env:
+          TWITCH_CLIENT_ID: ${{ secrets.TWITCH_CLIENT_ID }}
+          TWITCH_CLIENT_SECRET: ${{ secrets.TWITCH_CLIENT_SECRET }}
+          MINIMAX_API_KEY: ${{ secrets.MINIMAX_API_KEY }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+        run: |
+          if [ -n "${{ inputs.test_email }}" ]; then
+            python -m marketing.main --test-email "${{ inputs.test_email }}"
+          else
+            python -m marketing.main --limit ${{ inputs.limit || '20' }}
+          fi
+
+      - name: Commit updated CSV
+        if: inputs.test_email == ''
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add contacted_streamers.csv
+          git diff --quiet || git commit -m "Update contacted streamers CSV [skip ci]"
+          git push
