@@ -17,7 +17,7 @@ MINIMAX_MODEL = "MiniMax-M2.7"
 
 EMAIL_PROMPT = os.getenv("EMAIL_PROMPT", """Write a personal email to a Twitch streamer.
 
-CRITICAL: Never use em dashes (—) or en dashes (–). Use commas, semicolons, or periods instead. Standard hyphens (-) are fine for compound words only.
+CRITICAL: Never use em dashes or en dashes. Use commas, semicolons, or periods instead. Standard hyphens (-) are fine for compound words only.
 
 TONE: Be direct. Write like a thoughtful person reaching out, not a marketer.
 
@@ -36,6 +36,6 @@ REQUIREMENTS:
 - End with a casual CTA and include syncstream.app as plain text.
 
 OUTPUT FORMAT: Output ONLY valid JSON like this:
-{{"subject": "Your subject line", "body": "Dear {streamer_name},\n\nEmail body here...\n\nChristian at SyncStream"}}
+{"subject": "Your subject line", "body": "Dear {streamer_name},\n\nEmail body here...\n\nChristian at SyncStream"}
 
-Do not write anything else. Just output the JSON."""
+Do not write anything else. Just output the JSON.""")
