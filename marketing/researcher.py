@@ -50,12 +50,20 @@ async def generate_outreach_email(
     )
 
     text_content = ""
+    thinking_content = ""
     for block in message.content:
         if block.type == "text":
             text_content = block.text
-            break
+        elif block.type == "thinking":
+            thinking_content = getattr(block, 'thinking', '') or ''
+
+    if not text_content and thinking_content:
+        logger.info("No text block found, using thinking content as fallback")
+        text_content = thinking_content
 
     logger.info(f"MiniMax text response length: {len(text_content)}")
+    if text_content:
+        logger.info(f"MiniMax text response preview: {text_content[:300]}")
     return _parse_email_response(text_content, streamer_name, stream_title, game_name)
 
 
