@@ -51,9 +51,11 @@ async def generate_outreach_email(
         )
         resp.raise_for_status()
         data = resp.json()
-
+        logger.info(f"API response data keys: {list(data.keys())}")
+        logger.info(f"Choices[0] keys: {list(data.get('choices', [{}])[0].keys()) if data.get('choices') else 'no choices'}")
+        
     content = data["choices"][0]["message"]["content"]
-    logger.info(f"MiniMax raw response type: {type(content)}, content: {str(content)[:1000]}")
+    logger.info(f"MiniMax raw response type: {type(content)}, content: {str(content)[:500]}")
     if isinstance(content, dict):
         logger.info(f"Content is dict, keys: {list(content.keys())}")
     return _parse_email_response(content, streamer_name, stream_title, game_name)
@@ -71,14 +73,21 @@ def _parse_email_response(content: str, streamer_name: str = "there", stream_tit
 
     try:
         parsed = json.loads(content)
-        logger.info(f"Parsed type: {type(parsed)}, keys: {list(parsed.keys()) if isinstance(parsed, dict) else 'N/A'}")
+        logger.info(f"Parsed type: {type(parsed)}, content repr: {repr(parsed)[:200]}")
         
         if isinstance(parsed, dict):
+            logger.info(f"Dict keys: {list(parsed.keys())}")
             subject = str(parsed.get("subject", subject))
             body = str(parsed.get("body", ""))
+        elif isinstance(parsed, str):
+            logger.info(f"Parsed is string, re-parsing: {parsed[:200]}")
+            inner = json.loads(parsed)
+            logger.info(f"Inner dict keys: {list(inner.keys())}")
+            subject = str(inner.get("subject", subject))
+            body = str(inner.get("body", ""))
         else:
-            logger.info(f"Parsed is not a dict, trying line-by-line")
-            raise json.JSONDecodeError("Not a dict", content, 0)
+            logger.info(f"Parsed type not handled: {type(parsed)}, trying line-by-line")
+            raise json.JSONDecodeError("Not a dict or str", content, 0)
             
     except (json.JSONDecodeError, KeyError, TypeError, AttributeError) as e:
         logger.info(f"Parse failed: {type(e).__name__}: {e}, trying line-by-line")
