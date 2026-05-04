@@ -53,12 +53,17 @@ async def generate_outreach_email(
         data = resp.json()
 
     content = data["choices"][0]["message"]["content"]
-    logger.info(f"MiniMax raw response: {content[:1000]}")
+    logger.info(f"MiniMax raw response type: {type(content)}, content: {str(content)[:1000]}")
+    if isinstance(content, dict):
+        logger.info(f"Content is dict, keys: {list(content.keys())}")
     return _parse_email_response(content, streamer_name, stream_title, game_name)
 
 
 def _parse_email_response(content: str, streamer_name: str = "there", stream_title: str = "", game_name: str = "") -> GeneratedEmail:
-    content = content.strip()
+    if isinstance(content, dict):
+        content = json.dumps(content)
+    
+    content = str(content).strip()
     logger.info(f"Parsing content: {content[:500]}")
 
     subject = "Let's sync: try SyncStream"
