@@ -36,6 +36,6 @@ REQUIREMENTS:
 - End with a casual CTA and include syncstream.app as plain text.
 
 OUTPUT FORMAT: Output ONLY valid JSON like this:
-{"subject": "Your subject line", "body": "Dear {streamer_name},\n\nEmail body here...\n\nChristian at SyncStream"}
+{{"subject": "Your subject line", "body": "Dear {streamer_name},\n\nEmail body here...\n\nChristian at SyncStream"}}
 
 Do not write anything else. Just output the JSON.""")
