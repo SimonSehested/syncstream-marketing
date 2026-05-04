@@ -49,11 +49,14 @@ async def generate_outreach_email(
         ]
     )
 
-    text_content = ""
-    for block in message.content:
+    logger.info(f"MiniMax message content blocks: {len(message.content)}")
+    for i, block in enumerate(message.content):
+        logger.info(f"Block {i}: type={block.type}, hasattr_text={hasattr(block, 'text')}, hasattr_thinking={hasattr(block, 'thinking')}")
         if block.type == "text":
             text_content = block.text
             break
+    else:
+        text_content = ""
 
     logger.info(f"MiniMax text response length: {len(text_content)}")
     logger.info(f"MiniMax text response: {text_content[:500]}")
