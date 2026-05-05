@@ -7,7 +7,6 @@ MINIMAX_API_KEY = os.getenv("MINIMAX_API_KEY", "")
 RESEND_API_KEY = os.getenv("RESEND_API_KEY", "")
 RESEND_FROM_EMAIL = "SyncStream <christian@syncstream.app>"
 FRONTEND_URL = os.getenv("FRONTEND_URL", "https://syncstream.app")
-BCC_EMAIL = os.getenv("BCC_EMAIL", "")
 
 TWITCH_OAUTH_TOKEN_URL = "https://id.twitch.tv/oauth2/token"
 TWITCH_API_BASE = "https://api.twitch.tv/helix"

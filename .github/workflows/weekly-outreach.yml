@@ -47,14 +47,13 @@ jobs:
           TWITCH_CLIENT_SECRET: ${{ secrets.TWITCH_CLIENT_SECRET }}
           MINIMAX_API_KEY: ${{ secrets.MINIMAX_API_KEY }}
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
-          BCC_EMAIL: ${{ secrets.BCC_EMAIL }}
         run: |
           if [ "${{ inputs.test_from_stream }}" = "true" ]; then
             python -m marketing.main --test-from-stream --test-email "${{ inputs.test_email }}"
           elif [ -n "${{ inputs.test_email }}" ]; then
             python -m marketing.main --test-email "${{ inputs.test_email }}"
           else
-            python -m marketing.main --limit 50
+            python -m marketing.main --limit 25
           fi
 
       - name: Commit updated CSV

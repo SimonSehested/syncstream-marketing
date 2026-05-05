@@ -8,7 +8,6 @@ from .config import (
     TWITCH_CLIENT_SECRET,
     MINIMAX_API_KEY,
     RESEND_API_KEY,
-    BCC_EMAIL,
 )
 from .scraper import TwitchScraper
 from .researcher import generate_outreach_email
@@ -63,7 +62,7 @@ async def run(limit: int = 20, test_email: str = None, test_from_stream: bool = 
             logger.error(f"Traceback: {traceback.format_exc()}")
             sys.exit(1)
 
-        success = send_email(test_email, email.subject, email.body, bcc_email=BCC_EMAIL)
+        success = send_email(test_email, email.subject, email.body)
         if success:
             logger.info(f"TEST EMAIL SENT to {test_email}")
             logger.info(f"  Subject: {email.subject}")
@@ -87,7 +86,7 @@ async def run(limit: int = 20, test_email: str = None, test_from_stream: bool = 
             logger.error(f"AI generation failed: {type(e).__name__}: {e}")
             sys.exit(1)
 
-        success = send_email(test_email, email.subject, email.body, bcc_email=BCC_EMAIL)
+        success = send_email(test_email, email.subject, email.body)
         if success:
             logger.info(f"TEST EMAIL SENT to {test_email}")
         else:
@@ -136,7 +135,7 @@ async def run(limit: int = 20, test_email: str = None, test_from_stream: bool = 
             continue
 
         logger.info(f"[{streamer.display_name}] Sending email to {streamer.email}...")
-        success = send_email(streamer.email, email.subject, email.body, bcc_email=BCC_EMAIL if BCC_EMAIL else None)
+        success = send_email(streamer.email, email.subject, email.body)
 
         if success:
             mark_contacted(
