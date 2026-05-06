@@ -63,6 +63,14 @@ async def run(limit: int = 20, test_email: str = None, test_from_stream: bool = 
             sys.exit(1)
 
         success = send_email(test_email, email.subject, email.body)
+        mark_contacted(
+            twitch_user_id=streamer.twitch_user_id,
+            twitch_username=streamer.username,
+            email=test_email,
+            status="test_sent" if success else "test_failed",
+            ai_email_subject=email.subject,
+            ai_email_body=email.body,
+        )
         if success:
             logger.info(f"TEST EMAIL SENT to {test_email}")
             logger.info(f"  Subject: {email.subject}")
@@ -87,6 +95,14 @@ async def run(limit: int = 20, test_email: str = None, test_from_stream: bool = 
             sys.exit(1)
 
         success = send_email(test_email, email.subject, email.body)
+        mark_contacted(
+            twitch_user_id="test",
+            twitch_username="Test Streamer",
+            email=test_email,
+            status="test_sent" if success else "test_failed",
+            ai_email_subject=email.subject,
+            ai_email_body=email.body,
+        )
         if success:
             logger.info(f"TEST EMAIL SENT to {test_email}")
         else:
@@ -104,7 +120,8 @@ async def run(limit: int = 20, test_email: str = None, test_from_stream: bool = 
     scraper = TwitchScraper(TWITCH_CLIENT_ID, TWITCH_CLIENT_SECRET)
 
     logger.info("Fetching top Just Chatting streamers from Twitch...")
-    all_streamers = await scraper.get_top_streamers(limit=limit)
+    candidate_limit = max(limit * 10, 100)
+    all_streamers = await scraper.get_top_streamers(limit=candidate_limit)
     logger.info(f"Fetched {len(all_streamers)} streamers")
 
     uncontacted = [s for s in all_streamers if not is_contacted(s.twitch_user_id)]
@@ -115,6 +132,9 @@ async def run(limit: int = 20, test_email: str = None, test_from_stream: bool = 
     failed_count = 0
 
     for streamer in uncontacted:
+        if sent_count >= limit:
+            break
+
         if not streamer.email:
             logger.info(f"[{streamer.display_name}] No email in bio, skipping")
             skipped_no_email += 1
@@ -161,11 +181,13 @@ async def run(limit: int = 20, test_email: str = None, test_from_stream: bool = 
         await asyncio.sleep(1)
 
     logger.info(f"Done. Sent: {sent_count}, Failed: {failed_count}, Skipped (no email): {skipped_no_email}")
+    if sent_count < limit:
+        logger.warning(f"Only sent {sent_count} of {limit} requested emails. Not enough uncontacted streamers with emails were found.")
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="SyncStream weekly outreach")
-    parser.add_argument("--limit", type=int, default=20, help="Max streamers to process")
+    parser.add_argument("--limit", type=int, default=20, help="Number of emails to send")
     parser.add_argument("--test-email", type=str, default=None, help="Send test email to this address instead of running full outreach")
     parser.add_argument("--test-from-stream", action="store_true", default=False, help="Fetch a random real streamer and send their generated email to test-email address")
     args = parser.parse_args()
