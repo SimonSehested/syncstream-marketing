@@ -32,7 +32,6 @@ REQUIREMENTS:
 - Subject line: max 60 characters.
 - Sign from "Christian at SyncStream".
 - Always mention SyncStream: sync watchalongs so viewers watch in perfect sync from their own Netflix/Disney+/HBO.
-- Always mention the Chrome extension: https://chromewebstore.google.com/detail/syncstream/nbnbocdddjjadigghbmeedieihaocafo
 - Always include syncstream.app as plain text.
 - Never mention the person's bio or reveal where you got the information from.
 - End with a casual CTA.
