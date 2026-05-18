@@ -25,6 +25,10 @@ def send_email(to_email: str, subject: str, html_body: str) -> bool:
             "to": to_email,
             "subject": subject,
             "html": html_body,
+            "headers": {
+                "List-Unsubscribe": f"<{FRONTEND_URL}/unsubscribe?email={to_email}>",
+                "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+            },
         })
         logger.info(f"[SENDER] Email sent to {to_email}: {resp}")
         return True

@@ -36,8 +36,9 @@ REQUIREMENTS:
 - Always include syncstream.app as plain text.
 - Never mention the person's bio or reveal where you got the information from.
 - End with a casual CTA.
+- Add at the very bottom (after the CTA, on its own line): "Unsubscribe: {FRONTEND_URL}/unsubscribe?email={recipient_email}"
 
 OUTPUT FORMAT: Output ONLY valid JSON like this:
-{{"subject": "Your subject line", "body": "Dear {streamer_name},\n\nEmail body here...\n\nChristian at SyncStream"}}
+{{"subject": "Your subject line", "body": "Dear {streamer_name},\n\nEmail body here...\n\nChristian at SyncStream\n\nUnsubscribe: syncstream.app/unsubscribe?email=recipient@example.com"}}
 
 Do not write anything else. Just output the JSON.""")
