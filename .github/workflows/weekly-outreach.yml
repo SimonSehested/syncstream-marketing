@@ -1,6 +1,9 @@
 name: Weekly Streamer Outreach
 
 on:
+  # EMERGENCY STOP: automatic/API outreach is disabled to prevent unintended
+  # MiniMax usage after subscription renewal. Manual dispatch remains visible
+  # for future controlled re-enablement, but the job below is blocked.
   workflow_dispatch:
     inputs:
       limit:
@@ -18,11 +21,9 @@ on:
         required: false
         default: 'false'
         type: string
-  schedule:
-    - cron: '0 */13 * * *'
-
 jobs:
   outreach:
+    if: ${{ false }}
     runs-on: ubuntu-latest
     permissions: write-all
     steps:

@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 
 import anthropic
 from dataclasses import dataclass
@@ -22,6 +23,12 @@ async def generate_outreach_email(
     game_name: str = "",
     tags: list[str] = None,
 ) -> GeneratedEmail:
+    if os.getenv("DISABLE_MINIMAX_AUTOMATION", "true").lower() != "false":
+        raise RuntimeError(
+            "MiniMax automation is disabled. Set DISABLE_MINIMAX_AUTOMATION=false "
+            "only for an intentional re-enable."
+        )
+
     if tags is None:
         tags = []
     prompt = EMAIL_PROMPT.format(
